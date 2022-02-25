@@ -101,22 +101,17 @@
             <div class=" col-md-6 offset-md-3">
                 <div class="address">
                     {% load crispy_forms_tags %}
-                    <form method="post" action="{% url 'create' %}" enctype="multipart/form-data">
+                    <form method="POST" enctype="multipart/form-data">
                         {% csrf_token %}
                         <div class="row">
-                           <!--  <div class="col-sm-12">
-                                <input class="contactus" placeholder="Album title" type="text" name="album_title">
-                            </div>
+                            {{ form.song_title }}<br>
+                            {{ form.song_artist }}<br>
+                            <div>Song display image</div>
+                            {{ form.image }}<br>
+                            <div>Audio file</div><br>
+                            {{ form.file }}<br>
                             <div class="col-sm-12">
-                                <input class="contactus" placeholder="Genre" type="text" name="genre">
-                            </div>
-                            <input type="file" id="myFile" name="image"> -->
-                            {{ form.album_title }}<br>
-                            {{ form.genre }}<br>
-                            <div>Playlist image</div>
-                            {{ form.album_logo }}<br>
-                            <div class="col-sm-12">
-                                <button class="send" type="submit">Send</button>
+                                <button class="send" type="submit">Upload</button>
                             </div>
                         </div>
                     </form>
