@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+  <script src="https://kit.fontawesome.com/a14f8341f6.js" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<style type="text/css">
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Open Sans", sans-serif;
+}
+
+html, body {
+  background: #F2F6F7;
+}
+
+.player {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  justify-content: center;
+  align-items: center;
+}
+.player_inner {
+  background: #FFFBFE;
+  width: 20em;
+  height: 14em;
+}
+.player_inner__artwork {
+  height: 14em;
+  box-shadow: 7px 5px 40px gray;
+  border-radius: 3px;
+  display: flex;
+  flex-flow: column wrap;
+  align-items: flex-start;
+  padding: 1em;
+  position: relative;
+}
+.player_inner__artwork h1, .player_inner__artwork h2, .player_inner__artwork p {
+  text-transform: uppercase;
+  color: #FFF;
+}
+.player_inner__artwork h1 {
+  font-size: 1.5em;
+  font-weight: 700;
+  background: #3A4454;
+  padding: 0.2em;
+  min-width: 5em;
+}
+.player_inner__artwork h2 {
+  font-size: 0.7em;
+  font-weight: 300;
+  background: #88D9E6;
+  padding: 0.6em;
+}
+.player_inner__artwork p {
+  padding: 1em 0;
+  font-size: 0.6em;
+  bottom: 0;
+  position: absolute;
+}
+.player_inner__controls {
+  height: 3em;
+  width: 24em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translateY(-55%);
+}
+.player_inner__controls i {
+  color: #FFF;
+  background: #88D9E6;
+  border-radius: 100%;
+  font-size: 1em;
+  padding: 0.5em;
+  margin: auto 0.3em;
+  cursor: pointer;
+}
+.player_inner__controls i:nth-of-type(2) {
+  font-size: 1.5em;
+}
+</style>
+
+<input type="hidden" name="" id="title" value="{{ song.song_title }}">
+<input type="hidden" name="" id="artist" value="{{ song.song_artist }}">
+<input type="hidden" name="" id="views" value="{{ song.views }}">
+<input type="hidden" name="" id="likes" value="{{ song.likes }}">
+<input type="hidden" name="" id="image" value="{{ song.image.url }}">
+<input type="hidden" name="" id="track_url" value="{{ song.file.url }}">
+
+<div class='player'>
+  <div class='player_inner'>
+    <div class='player_inner__artwork'>
+      <h1 class='title'></h1>
+      <h2 class='song-name'></h2>
+      <p class='time'></p>
+    </div>
+    <div class='player_inner__controls'>
+      <i class="fa-solid fa-play play"></i>
+    </div>
+  </div>
+</div>
+<div align="center" style="margin-top: -200px;">
+Comments<br>
+<form method="GET" action="{% url 'add_comment' %}">
+  <input type="hidden" name="song_id" value="{{ song.id }}">
+  <textarea name="text">
+    
+  </textarea>
+  <button type="submit">Add comment</button>
+</form>
+</div>
+<div>
+</div>
+<div align="center" style="width: 200px; margin: 0 auto;">
+  {% for comment in song.comments.all %}
+      {{ comment.user }}
+      <textarea style="border: 2px solid gray;" disabled>
+        {{ comment.text }}
+      </textarea>
+  {% endfor %}  
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<script type="text/javascript">
+  
+class Player {
+  constructor(autoplay, songs = []) {
+    this.autoplay = autoplay;
+    this.state = "paused";
+    this.songs = songs;
+    this.audio = new Audio();
+    this.index = 0;
+    this.timer;
+    this.artwork = document.querySelector(".player_inner__artwork");
+
+    this.init();
+  }
+
+  addElement(selector, val) {
+    const el = document.querySelector(selector);
+    val ? (el.innerHTML = val) : "";
+  }
+
+  updateElement(el, newVal) {
+    document.querySelector(el).innerHTML = newVal;
+  }
+
+  init() {
+    this.artwork.style.background = "url(" + this.songs[0].artwork + ")";
+    this.artwork.style.backgroundSize = "cover";
+    this.artwork.style.backgroundPosition = "center";
+    if (this.autoplay) {
+      this.addElement(".play");
+      this.state = "playing";
+      this.play();
+    } else {
+      this.addElement(".play");
+      this.updateElement(".title", this.songs[0].artist);
+      this.updateElement(".song-name", this.songs[0].songName);
+    }
+  }
+
+  play() {
+    this.timeCount();
+    for (let i = this.index; i < this.songs.length; i++) {
+      if (!this.songs[i].playing) {
+        this.songs[i].playing = true;
+        this.audio.src = this.songs[i].src;
+        this.audio.play();
+        this.artwork.style.background = "url(" + this.songs[i].artwork + ")";
+        this.artwork.style.backgroundSize = "cover";
+        this.artwork.style.backgroundPosition = "center";
+        this.updateElement(".title", this.songs[i].artist);
+        this.updateElement(".song-name", this.songs[i].songName);
+        break;
+      }
+    }
+  }
+
+  timeCount() {
+    let duration;
+    let minutes;
+    let seconds;
+    let timeLeft;
+    this.audio.addEventListener("loadeddata", () => {
+      duration = this.audio.duration;
+      minutes = Math.floor(duration / 60);
+      seconds = Math.floor(duration - minutes * 60);
+      timeLeft = minutes + ":" + seconds;
+    });
+    this.timer = setInterval(() => {
+      duration = duration - 1;
+      minutes = Math.floor(duration / 60);
+      seconds = Math.floor(duration - minutes * 60);
+      if (seconds < 10) {
+        seconds = "0" + seconds;
+      }
+      timeLeft = minutes + ":" + seconds;
+      this.updateElement(".time", timeLeft);
+
+      if (timeLeft === "0:00" && this.index !== this.songs.length - 1) {
+        this.next();
+      } else if (timeLeft === "0:00" && this.index === this.songs.length - 1) {
+        clearInterval(this.timer);
+      }
+    }, 1000);
+  }
+
+  pause() {
+    for (let i = this.index; i < this.songs.length; i++) {
+      if (this.songs[i].playing) {
+        this.songs[i].playing = false;
+        this.audio.pause();
+        clearInterval(this.timer);
+        break;
+      }
+    }
+  }
+
+  next() {
+    for (let i = this.index; i < this.songs.length; i++) {
+      if (this.songs[i].playing && this.index !== this.songs.length - 1) {
+        this.songs[i].playing = false;
+        this.index++;
+        clearInterval(this.timer);
+        this.play();
+        break;
+      } else if (
+        !this.songs[i].playing &&
+        this.index !== this.songs.length - 1
+      ) {
+        this.index++;
+        this.artwork.style.background =
+          "url(" + this.songs[this.index].artwork + ")";
+        this.artwork.style.backgroundSize = "cover";
+        this.artwork.style.backgroundPosition = "center";
+        this.updateElement(".title", this.songs[this.index].artist);
+        this.updateElement(".song-name", this.songs[this.index].songName);
+        clearInterval(this.timer);
+      }
+    }
+  }
+
+  prev() {
+    for (let i = this.index; i < this.songs.length; i++) {
+      if (this.songs[i].playing && this.index === this.songs.length - 1) {
+        this.songs[i].playing = false;
+        this.index--;
+        clearInterval(this.timer);
+        this.play();
+        break;
+      } else if (
+        !this.songs[i].playing &&
+        this.index === this.songs.length - 1
+      ) {
+        this.index--;
+        this.artwork.style.background =
+          "url(" + this.songs[this.index].artwork + ")";
+        this.artwork.style.backgroundSize = "cover";
+        this.artwork.style.backgroundPosition = "center";
+        this.updateElement(".title", this.songs[this.index].artist);
+        this.updateElement(".song-name", this.songs[this.index].songName);
+        clearInterval(this.timer);
+      }
+    }
+  }
+}
+
+/* Instantiate Player */
+const title = document.getElementById('title').value;
+const artist = document.getElementById('artist').value;
+const url = document.getElementById('track_url').value;
+const image = document.getElementById('image').value;
+const views = document.getElementById('views').value;
+
+
+const player = new Player(true, [
+  {
+    artist: artist,
+    songName: title,
+    artwork: image,
+    src:
+      url,
+    playing: false
+  }
+]);
+
+/* Music Player Buttons */
+const playButton = document.querySelector(".play");
+const nextButton = document.querySelector(".next");
+const prevButton = document.querySelector(".prev");
+
+/* Event Listeners */
+playButton.addEventListener("click", () => {
+  if (player.state === "paused") {
+    player.play();
+    player.updateElement(".play");
+    player.state = "playing";
+  } else {
+    player.pause();
+    player.updateElement(".play");
+    player.state = "paused";
+  }
+});
+
+nextButton.addEventListener("click", () => {
+  player.next();
+});
+
+prevButton.addEventListener("click", () => {
+  player.prev();
+});
+
+
+</script>
+
+</body>
+</html>
