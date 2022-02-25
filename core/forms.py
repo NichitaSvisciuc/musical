@@ -31,3 +31,15 @@ class UserRegisterForm(UserCreationForm):
 		}
 
 		fields = ['username', 'password1', 'password2'] 
+
+class UploadSongForm(forms.ModelForm):
+
+	class Meta:
+		model = Song
+
+		widgets = {
+			'song_title' : forms.TextInput(attrs={'class': 'input-group', 'placeholder' : 'Song title'}),
+			'song_artist' : forms.TextInput(attrs={'class': 'input-group', 'placeholder' : 'Artist name'}),
+		}
+
+		fields = ['song_title', 'song_artist', 'image', 'file'] 		
