@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-@gg8xgl)gx382!mct@w77)v-elq6hd^gp68v-qfdp3s6#lovgh'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['musicalliity.herokuapp.com']
 
