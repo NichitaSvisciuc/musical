@@ -249,3 +249,6 @@ def add_comment(request):
 	curent_song.save()
 
 	return redirect('music_view', slug = curent_song.slug)	
+
+def upload_song(request):
+	return render(request, 'add_song.html')	
