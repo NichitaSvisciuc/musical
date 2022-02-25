@@ -237,6 +237,7 @@ def add_views(request):
 
 	return HttpResponse(status = 200) 
 
+@login_required
 def add_comment(request):
 
 	song_id = request.GET.get('song_id')
@@ -250,5 +251,26 @@ def add_comment(request):
 
 	return redirect('music_view', slug = curent_song.slug)	
 
+@login_required
 def upload_song(request):
-	return render(request, 'add_song.html')	
+
+	form = UploadSongForm()
+
+	if request.method == "POST":
+		form = UploadSongForm(request.POST, request.FILES)
+
+		if form.is_valid():
+
+			song = form.save(commit = False)
+
+			song.slug = song.song_title + song.song_artist + str(random.randint(1000, 10000))
+
+			song.save()
+
+
+		return redirect('music')
+
+	else:
+	   form = UploadSongForm()		
+
+	return render(request, 'add_song.html', {'form' : form})	
