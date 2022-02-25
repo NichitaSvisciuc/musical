@@ -161,9 +161,14 @@
     </div>
 
     <!-- Albums -->
+    <div align="center">
+        <a href="{% url 'upload_song' %}">Upload a song &nbsp&nbsp
+        <i class="fa-solid fa-plus"></i>
+        </a>
+    </div>
     {% for song in songs %}
 
-            <div align="center">
+            <div align="center" style="margin-top: 50px;">
                 <a href="{{ song.get_absolute_url }}">{{ song.song_artist }} - {{ song.song_title }}</a>
             <form method="GET" action="{% url 'add_to_fav' %}">  
                     <input type="hidden" name="song_id" value="{{ song.id }}">  
