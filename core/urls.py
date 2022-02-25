@@ -19,5 +19,6 @@ urlpatterns = [
 	path('add_comment/', add_comment, name = 'add_comment'),
 	path('add_views/', add_views, name = 'add_views'),
 	path('tracks/', tracks, name = 'tracks'),
+	path('upload_song/', upload_song, name = 'upload_song'),
 	path('contact/', contact, name = 'contact'),
 ]
